@@ -15,6 +15,27 @@ References: `Buttr.Core`, `CLabs.Utility`
 
 ### Assembly `CLabs.Crumb`
 
+### `Runtime/Common/CrumbEntry.cs`
+- **struct readonly CrumbEntry**
+  - `CrumbEntry(string level, string typeName, string message, DateTime timestamp)`
+  - `string Level` *(property)*
+  - `string TypeName` *(property)*
+  - `string Message` *(property)*
+  - `DateTime Timestamp` *(property)*
+
+### `Runtime/Components/BufferedCrumbSink.cs`
+- **class sealed BufferedCrumbSink** : ICrumbSink
+  - `BufferedCrumbSink(int capacity = 500)`
+  - `int Version` *(property)*
+  - `void Write(string level, string typeName, string message)`
+  - `IReadOnlyList<CrumbEntry> Snapshot()`
+  - `void Clear()`
+
+### `Runtime/Components/CompositeCrumbSink.cs`
+- **class sealed CompositeCrumbSink** : ICrumbSink
+  - `CompositeCrumbSink(params ICrumbSink[] sinks)`
+  - `void Write(string level, string typeName, string message)`
+
 ### `Runtime/Components/ConsoleCrumbSink.cs`
 - **class sealed ConsoleCrumbSink** : ICrumbSink
   - `void Write(string level, string typeName, string message)`
@@ -25,9 +46,6 @@ References: `Buttr.Core`, `CLabs.Utility`
   - `CrumbFileSink(ICrumbConfiguration configuration)`
   - `void Write(string level, string typeName, string message)`
   - `void Dispose()`
-  - `void InitializeWriter(this ICrumbConfiguration configuration, ref StreamWriter writer, ref string currentFilePath, ref long currentFileSize)`
-  - `void Rotate(this ICrumbConfiguration configuration, ref StreamWriter writer, ref string currentFilePath)`
-  - `void PruneOldFiles(this string directory, ICrumbConfiguration configuration)`
 
 ### `Runtime/Components/CrumbLogger.cs`
 - **class sealed CrumbLogger** : IDisposable

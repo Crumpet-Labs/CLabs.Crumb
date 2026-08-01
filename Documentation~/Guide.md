@@ -130,8 +130,8 @@ To swap in your own implementation — Unity SO, environment-variable-driven con
 ```csharp
 var builder = new ApplicationBuilder();
 builder.UseCrumbPackage()
-    .WithFactory<ICrumbConfiguration>(() => myConfigSource)
-    .WithFactory<ICrumbSink>(() => new MyCustomSink());
+    .WithImplementation<ICrumbConfiguration>(() => myConfigSource)
+    .WithImplementation<ICrumbSink>(() => new MyCustomSink());
 using var app = builder.Build();
 ```
 
@@ -177,4 +177,4 @@ The window discovers loggers via `Application<CrumbRegistry>.Get()` and reflects
 - **Don't share one `CrumbLogger` across types.** Initialize one per consumer; the registry's per-type keying is what makes the manager window and per-class filtering work.
 - **Don't write to the file sink at high frequency.** Every `Write` flushes; for hot-path logging consider a custom `ICrumbSink` that batches.
 - **Don't expect log loss to be visible.** Filters silently drop; if you can't see a level in your sink, check `Enabled` and `Filters` first.
-- **Don't lose the configuration override.** If you call `UseCrumbPackage()` and never `.WithFactory<ICrumbConfiguration>(...)`, you get `CrumbConfiguration`'s defaults — including a relative `"Logs"` directory that may not be where you want logs to land.
+- **Don't lose the configuration override.** If you call `UseCrumbPackage()` and never `.WithImplementation<ICrumbConfiguration>(...)`, you get `CrumbConfiguration`'s defaults — including a relative `"Logs"` directory that may not be where you want logs to land.

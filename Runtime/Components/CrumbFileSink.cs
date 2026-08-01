@@ -3,6 +3,11 @@ using System.IO;
 using System.Linq;
 
 namespace CLabs.Crumb {
+    /// <summary>
+    /// An <see cref="ICrumbSink"/> that appends timestamped log lines to a rolling <c>current.log</c>, rotating to a
+    /// timestamped file once the size cap is reached and pruning the oldest rotated files. Thread-safe; file paths,
+    /// size cap, and retention come from <see cref="ICrumbConfiguration"/>.
+    /// </summary>
     public sealed class CrumbFileSink : ICrumbSink, IDisposable {
         private readonly ICrumbConfiguration m_Configuration;
         private readonly object m_Lock = new();
@@ -20,7 +25,7 @@ namespace CLabs.Crumb {
         }
 
         public void Write(string level, string typeName, string message) {
-            if (!m_Configuration.FileLoggingEnabled) return;
+            if (false == m_Configuration.FileLoggingEnabled) return;
 
             var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} [{level}] [{typeName}] {message}";
 
@@ -50,11 +55,12 @@ namespace CLabs.Crumb {
     }
 
     internal static class CrumbFileSinkInternals {
-        public static void InitializeWriter(this ICrumbConfiguration configuration, ref StreamWriter writer, ref string currentFilePath, ref long currentFileSize) {
+        internal static void InitializeWriter(this ICrumbConfiguration configuration, ref StreamWriter writer, ref string currentFilePath, ref long currentFileSize) {
             var directory = configuration.LogDirectory;
-            
-            if (!Directory.Exists(directory))
+
+            if (false == Directory.Exists(directory)) {
                 Directory.CreateDirectory(directory);
+            }
 
             currentFilePath = Path.Combine(directory, "current.log");
             var append = File.Exists(currentFilePath);
@@ -63,7 +69,7 @@ namespace CLabs.Crumb {
             currentFileSize = append ? new FileInfo(currentFilePath).Length : 0;
         }
 
-        public static void Rotate(this ICrumbConfiguration configuration, ref StreamWriter writer, ref string currentFilePath) {
+        internal static void Rotate(this ICrumbConfiguration configuration, ref StreamWriter writer, ref string currentFilePath) {
             writer?.Dispose();
             writer = null;
 
@@ -71,22 +77,27 @@ namespace CLabs.Crumb {
             var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var rotatedPath = Path.Combine(directory, $"log_{timestamp}.log");
             var attempt = 2;
-            while (File.Exists(rotatedPath))
+            while (File.Exists(rotatedPath)) {
                 rotatedPath = Path.Combine(directory, $"log_{timestamp}_{attempt++}.log");
+            }
+
             File.Move(currentFilePath, rotatedPath);
 
             directory.PruneOldFiles(configuration);
         }
 
-        public static void PruneOldFiles(this string directory, ICrumbConfiguration configuration) {
+        internal static void PruneOldFiles(this string directory, ICrumbConfiguration configuration) {
             var logFiles = Directory.GetFiles(directory, "log_*.log")
                 .OrderByDescending(f => f)
                 .Skip(configuration.MaxFileCount)
                 .ToArray();
 
             foreach (var file in logFiles) {
-                try { File.Delete(file); }
-                catch { /* silently skip files that can't be deleted */ }
+                try {
+                    File.Delete(file);
+                }
+                catch {
+                }
             }
         }
     }

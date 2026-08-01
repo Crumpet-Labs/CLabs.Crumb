@@ -102,14 +102,14 @@ The default `ICrumbSink` is `ConsoleCrumbSink` (writes to `System.Console`). Ove
 ```csharp
 // Unity adapter wires this for you via UnityCrumbSink — but you can do it yourself:
 builder.UseCrumbPackage()
-    .WithFactory<ICrumbSink>(() => new UnityCrumbSink());
+    .WithImplementation<ICrumbSink>(() => new UnityCrumbSink());
 ```
 
 For tests that should never see Crumb output, swap in `NullCrumbSink`:
 
 ```csharp
 builder.UseCrumbPackage()
-    .WithFactory<ICrumbSink>(() => new NullCrumbSink());
+    .WithImplementation<ICrumbSink>(() => new NullCrumbSink());
 ```
 
 Custom sinks are equally easy — implement `ICrumbSink.Write(level, typeName, message)` and route to whatever you like (in-memory buffer, network endpoint, structured-logging backend).
@@ -120,7 +120,7 @@ Custom sinks are equally easy — implement `ICrumbSink.Write(level, typeName, m
 
 ```csharp
 builder.UseCrumbPackage()
-    .WithFactory<ICrumbConfiguration>(() => new CrumbConfiguration(
+    .WithImplementation<ICrumbConfiguration>(() => new CrumbConfiguration(
         logDirectory: "/var/log/myapp",
         fileLoggingEnabled: true,
         maxFileSizeBytes: 10 * 1024 * 1024,

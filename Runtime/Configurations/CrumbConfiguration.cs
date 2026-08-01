@@ -1,11 +1,12 @@
 namespace CLabs.Crumb {
+    /// <summary>The default plain-C# <see cref="ICrumbConfiguration"/>. Under Unity, a <c>CrumbConfigurationSO</c> supplies these values from an asset.</summary>
     public sealed class CrumbConfiguration : ICrumbConfiguration {
         private readonly bool m_FileLoggingEnabled;
         private readonly string m_LogDirectory;
         private readonly long m_MaxFileSizeBytes;
         private readonly int m_MaxFileCount;
         private readonly CrumbFilters m_DefaultFilters;
-        
+
         public CrumbConfiguration(
             string logDirectory = "Logs",
             bool fileLoggingEnabled = true,
@@ -18,11 +19,11 @@ namespace CLabs.Crumb {
             m_MaxFileCount = maxFileCount;
             m_DefaultFilters = defaultFilters;
         }
-        
-        public bool FileLoggingEnabled => m_FileLoggingEnabled; 
-        public string LogDirectory => m_LogDirectory; 
-        public long MaxFileSizeBytes => m_MaxFileSizeBytes; 
-        public int MaxFileCount => m_MaxFileCount; 
-        public CrumbFilters DefaultFilters => m_DefaultFilters; 
+
+        public bool FileLoggingEnabled => m_FileLoggingEnabled;
+        public string LogDirectory => m_LogDirectory;
+        public long MaxFileSizeBytes => m_MaxFileSizeBytes;
+        public int MaxFileCount => m_MaxFileCount;
+        public CrumbFilters DefaultFilters => m_DefaultFilters;
     }
 }
